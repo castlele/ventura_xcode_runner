@@ -1,5 +1,7 @@
 # Xcode Runner
 
+![telegram-cloud-photo-size-2-5395861517154501244-m](https://user-images.githubusercontent.com/69932531/198831583-ddee994a-87b9-408c-91d5-3321fe0769f8.jpg)
+
 If situation above is known to you this script will help.
 
 ## How to get started
