@@ -15,6 +15,8 @@ OPEN_CMD = "open"
 HELP_CMD = "help"
 V_LIST_CMD = "versions"
 
+XCODEPROJ = "xcodeproj"
+XCWORKSPACE = "xcworkspace"
 
 def configure_app_version(app: str) -> str:
     components = app.split("-")
@@ -47,11 +49,25 @@ def xcode_version_parser(version: str) -> str:
     exit(1)
 
 
+def get_workspace_path(path: str) -> str:
+    files = os.listdir(path)
+    workspace_filer = filter(lambda file: XCWORKSPACE in file, files)
+    xproj_filter = filter(lambda file: XCODEPROJ in file, files)
+
+    if (workspace_filer):
+        return list(workspace_filer)[0]
+
+    if (xproj_filter):
+        return list(xproj_filter)[0]
+
+    return ""
+
+
 def print_help():
     print("""
-    xcode_runnder                       : opens default xcode (usually with name Xcode.app).
-    xcode_runner <xcode_version>        : opens xcode with specified version, if there is no specified version, program will search by major version. 
-    xcode_runner <versions>             : prints a full list of available versions.
+    xrun                        : opens default xcode (usually with name Xcode.app).
+    xrun <xcode_version>        : opens xcode with specified version, if there is no specified version, program will search by major version. 
+    xrun versions               : prints a full list of available versions.
     """)
 
 
@@ -59,21 +75,18 @@ def print_xcode_version():
     print([k for k in get_available_xcodes().keys()])
 
 
-def execute_open_command(command: str):
-    executable = command
+def execute_open_command(command: str, workspace: str = ""):
+    open = OPEN_CMD + " " + command 
 
     if CUR_MAJOR_V not in command:
-        executable += EXECUTABLE_PATH
+        os.system(open + EXECUTABLE_PATH + " " + workspace)
+        return
 
-    os.system(OPEN_CMD + " " + executable)
+    os.system(open + " " + workspace)
 
 
 def main():
     arguments = sys.argv
-    
-    if len(arguments) > 2:
-        print("Too many arguments passed")
-        exit(1)
     
     if len(arguments) < 2:
         path = xcode_version_parser(DEFAULT_V)
@@ -89,7 +102,12 @@ def main():
         exit(0)
 
     path = xcode_version_parser(arguments[1])
-    execute_open_command(path)
+    workspace_path = ""
+
+    if len(arguments) > 2:
+        workspace_path = get_workspace_path(arguments[2])
+
+    execute_open_command(path, workspace=workspace_path)
 
 
 if __name__ == "__main__":
