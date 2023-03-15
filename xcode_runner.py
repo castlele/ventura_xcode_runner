@@ -28,7 +28,7 @@ def configure_app_version(app: str) -> str:
 
 
 def get_available_xcodes() -> dict:
-    return {configure_app_version(app): BASE_DIR + app 
+    return {configure_app_version(app): BASE_DIR + app
             for app in os.listdir(BASE_DIR)
             if "xcode" in app.lower() and app not in BLACK_LIST}
 
@@ -37,7 +37,7 @@ def xcode_version_parser(version: str) -> str:
     available_xcodes = get_available_xcodes()
 
     if version in available_xcodes:
-        return available_xcodes[version] 
+        return available_xcodes[version]
 
     major = version.split(".")[0]
 
@@ -51,14 +51,14 @@ def xcode_version_parser(version: str) -> str:
 
 def get_workspace_path(path: str) -> str:
     files = os.listdir(path)
-    workspace_filer = filter(lambda file: XCWORKSPACE in file, files)
-    xproj_filter = filter(lambda file: XCODEPROJ in file, files)
+    workspace_filter = list(filter(lambda file: XCWORKSPACE in file, files))
+    xproj_filter = list(filter(lambda file: XCODEPROJ in file, files))
 
-    if (workspace_filer):
-        return list(workspace_filer)[0]
+    if (workspace_filter):
+        return workspace_filter[0]
 
     if (xproj_filter):
-        return list(xproj_filter)[0]
+        return xproj_filter[0]
 
     return ""
 
@@ -66,7 +66,7 @@ def get_workspace_path(path: str) -> str:
 def print_help():
     print("""
     xrun                        : opens default xcode (usually with name Xcode.app).
-    xrun <xcode_version>        : opens xcode with specified version, if there is no specified version, program will search by major version. 
+    xrun <xcode_version>        : opens xcode with specified version, if there is no specified version, program will search by major version.
     xrun versions               : prints a full list of available versions.
     """)
 
@@ -76,7 +76,7 @@ def print_xcode_version():
 
 
 def execute_open_command(command: str, workspace: str = ""):
-    open = OPEN_CMD + " " + command 
+    open = OPEN_CMD + " " + command
 
     if CUR_MAJOR_V not in command:
         os.system(open + EXECUTABLE_PATH + " " + workspace)
@@ -87,7 +87,7 @@ def execute_open_command(command: str, workspace: str = ""):
 
 def main():
     arguments = sys.argv
-    
+
     if len(arguments) < 2:
         path = xcode_version_parser(DEFAULT_V)
         execute_open_command(path)
